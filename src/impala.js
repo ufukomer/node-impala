@@ -75,17 +75,17 @@ function impalaClient(config) {
     };
 
     return {
-        query: function (query, onCompletion) {
-            connect(onCompletion, function (client) {
-                client.query(query, function (handle) {
-                    client.get_state(handle, function (state) {
-                        client.explain(query, function (explain) {
-                            client.fetch(handle, function (result) {
-                                client.get_results_metadata(handle, function (metaData) {
-                                    client.closeConnection(state);
-                                    console.log(explain.textual);
-                                    console.log(metaData.schema.fieldSchemas);
-                                    console.log(result.data);
+    query: function (query, onCompletion) {
+        connect(onCompletion, function (client) {
+            client.query(query, function (handle) {
+                client.get_state(handle, function (state) {
+                    client.explain(query, function (explain) {
+                        client.fetch(handle, function (result) {
+                            client.get_results_metadata(handle, function (metaData) {
+                                client.closeConnection(state);
+                                console.log(explain.textual);
+                                console.log(metaData.schema.fieldSchemas);
+                                console.log(result.data);
                                 });
                             });
                         });
