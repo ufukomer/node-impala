@@ -1,0 +1,27 @@
+{
+  "name": "node-impala",
+  "version": "0.0.0",
+  "description": "Impala connector for NodeJS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "thrift",
+    "impala"
+  ],
+  "author": "Omer Ufuk Efendioglu <ufukomer@gmail.com> (http://ufukomer.com/)",
+  "contributors": [
+    {"name": "Omer Ufuk Efendioglu", "email": "ufukomer@gmail.com"},
+    {"name": "Harun Urhan"}
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "thrift": "^0.9.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-thrift": "0.0.2"
+  }
+}
