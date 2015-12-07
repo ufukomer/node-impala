@@ -8,7 +8,7 @@ var version = 'chd5-2.1_5.3.0/';
 var basePaths = {
 	src: 'src/',
 	dest: 'lib/'
-}
+};
 
 var paths = {
 	js: {
@@ -19,7 +19,7 @@ var paths = {
 		src: basePaths.src + version + '*.thrift',
 		dest: basePaths.dest + version
 	}
-}
+};
 
 // 'gulp' command runs watch task as default
 gulp.task('default', ['watch']);
