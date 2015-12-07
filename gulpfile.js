@@ -24,8 +24,8 @@ var paths = {
 // 'gulp' command runs watch task as default
 gulp.task('default', ['watch']);
 
-// Watch changes on impala.js
 gulp.task('watch', ['js'], () => {
+	// Watch changes on impala.js
 	gulp.watch(paths.js.src, ['js']);
 });
 
