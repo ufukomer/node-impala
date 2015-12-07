@@ -1,1 +1,1 @@
-#node-impala
+#Impala Client
