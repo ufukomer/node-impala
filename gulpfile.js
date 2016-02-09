@@ -1,5 +1,4 @@
 const gulp = require('gulp');
-const babel = require('gulp-babel');
 const thrift = require('gulp-thrift');
 
 const basePaths = {
@@ -29,7 +28,8 @@ gulp.task('watch', ['js'], () => {
 });
 
 /**
- * Generate thrift files. This task requires to havethrift installed in the system.
+ * Generate thrift files. This task requires to have thrift
+ * installed in the system.
  */
 gulp.task('thrift', () => {
     gulp.src(paths.thrift.src)
