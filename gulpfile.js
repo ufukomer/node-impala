@@ -1,7 +1,6 @@
 const gulp = require('gulp');
+const babel = require('gulp-babel');
 const thrift = require('gulp-thrift');
-
-const version = 'chd5-2.1_5.3.0/';
 
 const basePaths = {
     src: 'src/',
@@ -10,16 +9,18 @@ const basePaths = {
 
 const paths = {
     js: {
-        src: basePaths.src + 'impala.js',
+        src: `${ basePaths.src }thrift-impala.js`,
         dest: basePaths.dest
     },
     thrift: {
-        src: basePaths.src + version + '*.thrift',
-        dest: basePaths.dest + version
+        src: `${ basePaths.src }thrift/*.thrift`,
+        dest: `${ basePaths.dest }thrift/`
     }
 };
 
-// 'gulp' command runs watch task as default
+/**
+ * Runs watch task as default
+ */
 gulp.task('default', ['watch']);
 
 gulp.task('watch', ['js'], () => {
@@ -27,7 +28,9 @@ gulp.task('watch', ['js'], () => {
     gulp.watch(paths.js.src, ['js']);
 });
 
-// Generate thrift files
+/**
+ * Generate thrift files. This task requires to havethrift installed in the system.
+ */
 gulp.task('thrift', () => {
     gulp.src(paths.thrift.src)
         .pipe(thrift({
@@ -36,7 +39,9 @@ gulp.task('thrift', () => {
         .pipe(gulp.dest(paths.thrift.dest));
 });
 
-// Copy impla.js from src/ to lib/
+/**
+ * Copy impala.js from source to destination.
+ */
 gulp.task('js', () => {
     gulp.src(paths.js.src)
         .pipe(gulp.dest(paths.js.dest));

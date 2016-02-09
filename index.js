@@ -1,1 +1,1 @@
-module.exports = require('./lib/impala');
+module.exports = require('./lib/thrift-impala');

@@ -1,52 +1,43 @@
 "use strict";
 
 var thrift = require('thrift');
-var ImpalaService = require('../lib/chd5-2.1_5.3.0/ImpalaService');
-var beeswax_types = require('../lib/chd5-2.1_5.3.0/beeswax_types');
+var assert = require('assert');
+var ImpalaService = require('../lib/thrift/ImpalaService');
+var beeswax_types = require('../lib/thrift/beeswax_types');
 
-var connection = thrift.createConnection('192.168.140.131', 21000, {
-  transport: thrift.TBufferedTransport,
-  protocol: thrift.TBinaryProtocol,
-  timeout: 60000
+var connection = thrift.createConnection('192.168.93.128', 21000, {
+    transport: thrift.TBufferedTransport,
+    protocol: thrift.TBinaryProtocol,
+    timeout: 1000
 });
 
 connection.on('error', function (err) {
-  console.error(err);
+    assert.ifError(err);
 });
 
 var query = new beeswax_types.Query({
-  query: 'SELECT * FROM sample_07 LIMIT 5'
-})
+    query: 'SELECT * FROM sample_07 LIMIT 5'
+});
 
 var client = thrift.createClient(ImpalaService, connection);
 
 client.query(query, function (err, handle) {
-  if (err) console.error(err)
-  else {
+    assert.ifError(err);
     client.get_state(handle, function (err, state) {
-      if (err) console.error(err)
-      else {
+        assert.ifError(err);
         client.explain(query, function (err, explain) {
-          if (err) console.error(err)
-          else {
+            assert.ifError(err);
             client.fetch(handle, false, 100, function (err, result) {
-              if (err) console.error(err)
-              else {
+                assert.ifError(err);
                 client.get_results_metadata(handle, function (err, metaData) {
-                  if (err) console.error(err)
-                  else {
-                    console.log(explain.textual);
-                    console.log(metaData.schema.fieldSchemas);
-                    console.log(result.data);
+                    assert.ifError(err);
+                    assert.equal(5, result.data.length);
+                    assert.ok(metaData.schema.fieldSchemas[0].name);
+                    assert.ok(metaData.schema.fieldSchemas[0].type);
                     if (state === beeswax_types.QueryState.FINISHED)
-                      connection.end();
-                  }
+                        connection.end();
                 });
-              }
             });
-          }
         });
-      }
     });
-  }
 });
