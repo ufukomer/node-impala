@@ -31,11 +31,13 @@ client.query(query, function (err, handle) {
                 assert.ifError(err);
                 client.get_results_metadata(handle, function (err, metaData) {
                     assert.ifError(err);
+                    assert.ok(explain.textual);
                     assert.equal(5, result.data.length);
                     assert.ok(metaData.schema.fieldSchemas[0].name);
                     assert.ok(metaData.schema.fieldSchemas[0].type);
-                    if (state === beeswax_types.QueryState.FINISHED)
+                    if (state === beeswax_types.QueryState.FINISHED) {
                         connection.end();
+                    }
                 });
             });
         });

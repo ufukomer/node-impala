@@ -8,10 +8,6 @@ var Q = require('q');
 var types = require('./thrift/beeswax_types');
 var service = require('./thrift/ImpalaService');
 
-module.exports.createClient = function (props) {
-    return new ImpalaClient(props);
-};
-
 /**
  * Constructor method of ImpalaClient which initializes
  * essential properties for connection.
@@ -38,38 +34,41 @@ function ImpalaClient(props) {
  * @returns {*|promise}
  */
 ImpalaClient.prototype.query = function (sql, callback) {
-    var deferred = Q.defer();
-    var connection = thrift.createConnection(this.host, this.port, this.options);
-    var client = thrift.createClient(service, connection);
-    var query = new types.Query({query: sql});
+    var deferred = Q.defer(),
+        connection = thrift.createConnection(this.host, this.port, this.options),
+        client = thrift.createClient(service, connection),
+        query = new types.Query({ query: sql });
 
-    client.query(query, function (err, handle) {
-        if (err) console.error(err);
-        else {
-            client.get_state(handle, function (err, state) {
-                if (err) console.error(err);
-                else {
-                    client.explain(query, function (err, explain) {
-                        if (err) console.error(err);
-                        else {
-                            client.fetch(handle, false, 100, function (err, result) {
-                                if (err) console.error(err);
-                                else {
-                                    client.get_results_metadata(handle, function (err, metaData) {
-                                        if (err) console.error(err);
-                                        else {
-                                            deferred.resolve(result.data);
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
-    });
+    client.query(query)
+        .then(function (handle) {
+            return [handle, client.get_state(handle)];
+        })
+        .spread(function (handle, state) {
+            return [handle, state, client.fetch(handle)];
+        })
+        .spread(function (handle, state, result) {
+            // TODO: link below with [result.data]
+            deferred.resolve(result.data);
+            return [state, client.get_results_metadata(handle)];
+        })
+        .spread(function (state, metaData) {
+            // TODO: link above with [metaData.schema.fieldSchemas]
+            return state;
+        })
+        .then(function (state) {
+            if (state === types.QueryState.FINISHED) {
+                connection.end();
+            }
+        })
+        .catch(function (err) {
+            connection.end();
+            deferred.reject(err);
+        });
 
     deferred.promise.nodeify(callback);
     return deferred.promise;
+};
+
+module.exports.createClient = function (props) {
+    return new ImpalaClient(props);
 };

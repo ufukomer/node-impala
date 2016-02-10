@@ -8,10 +8,10 @@ var client = impala.createClient({
 
 var sql = 'SELECT * FROM sample_07 LIMIT 5';
 
-client.query(sql, function (err, result) {
-    if (err) {
-        console.error(err);
-    } else {
+client.query(sql)
+    .then(function (result) {
         console.log(result);
-    }
-});
+    })
+    .catch(function (err) {
+        console.error(err);
+    });
