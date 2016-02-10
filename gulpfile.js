@@ -18,7 +18,7 @@ const paths = {
 };
 
 /**
- * Runs watch task as default
+ * Runs watch task as default.
  */
 gulp.task('default', ['watch']);
 
