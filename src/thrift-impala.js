@@ -47,12 +47,18 @@ ImpalaClient.prototype.query = function (sql, callback) {
             return [handle, state, client.fetch(handle)];
         })
         .spread(function (handle, state, result) {
-            // TODO: link below with [result.data]
-            deferred.resolve(result.data);
-            return [state, client.get_results_metadata(handle)];
+            return [state, result, client.get_results_metadata(handle)];
         })
-        .spread(function (state, metaData) {
-            // TODO: link above with [metaData.schema.fieldSchemas]
+        .spread(function (state, result, metaData) {
+            var map = new Map();
+            for (var j = 0; j < metaData.schema.fieldSchemas.length; j++) {
+                var resultArray = [];
+                for (var i = 0; i < result.data.length; i++) {
+                    resultArray.push(result.data[i].split("\t")[j]);
+                }
+                map.set(metaData.schema.fieldSchemas[j].name, resultArray);
+            }
+            deferred.resolve(map);
             return state;
         })
         .then(function (state) {
