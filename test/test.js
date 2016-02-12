@@ -2,24 +2,23 @@
 
 var thrift = require('thrift');
 var assert = require('assert');
-var ImpalaService = require('../lib/thrift/ImpalaService');
-var beeswax_types = require('../lib/thrift/beeswax_types');
+var service = require('../lib/thrift/ImpalaService');
+var types = require('../lib/thrift/beeswax_types');
 
 var connection = thrift.createConnection('192.168.93.128', 21000, {
     transport: thrift.TBufferedTransport,
-    protocol: thrift.TBinaryProtocol,
-    timeout: 1000
+    protocol: thrift.TBinaryProtocol
 });
 
 connection.on('error', function (err) {
     assert.ifError(err);
 });
 
-var query = new beeswax_types.Query({
+var query = new types.Query({
     query: 'SELECT * FROM sample_07 LIMIT 5'
 });
 
-var client = thrift.createClient(ImpalaService, connection);
+var client = thrift.createClient(service, connection);
 
 client.query(query, function (err, handle) {
     assert.ifError(err);
@@ -35,7 +34,7 @@ client.query(query, function (err, handle) {
                     assert.equal(5, result.data.length);
                     assert.ok(metaData.schema.fieldSchemas[0].name);
                     assert.ok(metaData.schema.fieldSchemas[0].type);
-                    if (state === beeswax_types.QueryState.FINISHED) {
+                    if (state === types.QueryState.FINISHED) {
                         connection.end();
                     }
                 });

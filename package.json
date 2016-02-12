@@ -1,5 +1,5 @@
 {
-  "name": "thrift-impala",
+  "name": "node-impala",
   "version": "0.0.0",
   "description": "Node Client for Impala using Apache Thrift.",
   "main": "index.js",
@@ -13,9 +13,10 @@
   "keywords": [
     "node",
     "thrift",
-    "impala"
+    "impala",
+    "client"
   ],
-  "author": "Omer Ufuk Efendioglu <ufukomer@gmail.com> (http://ufukomer.com/)",
+  "author": "Omer Ufuk Efendioglu <ufukomer@gmail.com> (http://ufukomer.com)",
   "contributors": [
     {
       "name": "Omer Ufuk Efendioglu",
@@ -24,11 +25,11 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "thrift": "^0.9.3"
+    "thrift": "^0.9.3",
+    "q": "^1.4.1"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-thrift": "0.0.2",
-    "q": "^1.4.1"
+    "gulp-thrift": "0.0.2"
   }
 }

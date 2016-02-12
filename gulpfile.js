@@ -8,7 +8,7 @@ const basePaths = {
 
 const paths = {
     js: {
-        src: `${ basePaths.src }thrift-impala.js`,
+        src: `${ basePaths.src }*.js`,
         dest: basePaths.dest
     },
     thrift: {
