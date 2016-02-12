@@ -4,8 +4,9 @@ var thrift = require('thrift');
 var assert = require('assert');
 var service = require('../lib/thrift/ImpalaService');
 var types = require('../lib/thrift/beeswax_types');
+var config = require('./config');
 
-var connection = thrift.createConnection('192.168.93.128', 21000, {
+var connection = thrift.createConnection(config.server, config.port, {
     transport: thrift.TBufferedTransport,
     protocol: thrift.TBinaryProtocol
 });
@@ -15,7 +16,7 @@ connection.on('error', function (err) {
 });
 
 var query = new types.Query({
-    query: 'SELECT * FROM sample_07 LIMIT 5'
+    query: "SELECT * FROM " + config.table + " LIMIT 5"
 });
 
 var client = thrift.createClient(service, connection);

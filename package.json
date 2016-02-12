@@ -2,20 +2,6 @@
   "name": "node-impala",
   "version": "0.0.0",
   "description": "Node Client for Impala using Apache Thrift.",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ufukomer/node-thrift-impala"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "node",
-    "thrift",
-    "impala",
-    "client"
-  ],
   "author": "Omer Ufuk Efendioglu <ufukomer@gmail.com> (http://ufukomer.com)",
   "contributors": [
     {
@@ -23,7 +9,28 @@
       "email": "ufukomer@gmail.com"
     }
   ],
+  "scripts": {
+    "test": "node ./test/test.js",
+    "start": "node index.js"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ufukomer/node-impala.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ufukomer/node-impala/issues"
+  },
+  "keywords": [
+    "node",
+    "thrift",
+    "impala",
+    "client",
+    "hive",
+    "hadoop"
+  ],
   "license": "MIT",
+  "analyze": true,
   "dependencies": {
     "thrift": "^0.9.3",
     "q": "^1.4.1"
