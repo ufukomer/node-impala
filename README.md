@@ -109,6 +109,6 @@ Timeout value for closing connection if it remains open.
 Pull requests must follow coding standard. Please scrutinize
 commits carefully.
 
-## Licence
+## License
 
 MIT © [ufukomer](http://ufukomer.com)
