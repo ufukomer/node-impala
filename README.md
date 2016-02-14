@@ -104,6 +104,10 @@ Default: `1000`
 
 Timeout value for closing connection if it remains open.
 
+## Versions
+
+`1.x.x` uses Impala `chd5-2.1_5.3.0`.
+
 ## Contributing
 
 Pull requests must follow coding standard. Please scrutinize
