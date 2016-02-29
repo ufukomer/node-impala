@@ -57,7 +57,7 @@ var client = impala.createClient({
     timeout: 5000
 });
 
-var sql = "SELECT * FROM sample_07 limit 5";
+var sql = "SELECT * FROM sample_07 LIMIT 5";
 
 client.query(sql)
     .then(function (result) {
@@ -79,7 +79,7 @@ If you are connecting Thrift Server remotely, such as
 connecting Cloudera from your host machine instead virtual
 machine, it corresponds to inet address of virtual machine
 that you can learn using `ifconfig` command in terminal.
-You should leave it as its default if you are connecting from
+Otherwise, you should leave it as its default if you are connecting from
 virtual machine.
 
 ### port
@@ -103,6 +103,10 @@ Type: `number`<br>
 Default: `1000`
 
 Timeout value for closing connection if it remains open.
+
+## Versions
+
+`1.x.x` uses Impala `chd5-2.1_5.3.0`.
 
 ## Contributing
 
