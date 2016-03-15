@@ -1,0 +1,2 @@
+# Ignore thrift js files, since it is not safe and easy to port all of it to ES6
+**/lib/thrift/*
