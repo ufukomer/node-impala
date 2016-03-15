@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "test": "node ./test/test.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "eslint": "./node_modules/.bin/eslint .; exit 0"
   },
   "main": "index.js",
   "repository": {
@@ -36,6 +37,10 @@
     "q": "^1.4.1"
   },
   "devDependencies": {
+    "babel-eslint": "^5.0.0",
+    "eslint": "^2.4.0",
+    "eslint-config-airbnb": "^6.1.0",
+    "eslint-plugin-react": "^4.2.2",
     "gulp": "^3.9.0",
     "gulp-thrift": "0.0.2"
   }
