@@ -1,97 +1,149 @@
-"use strict";
-
 /**
  * @module NodeImpala
  */
-var thrift = require('thrift');
-var Q = require('q');
-var types = require('./thrift/beeswax_types');
-var service = require('./thrift/ImpalaService');
+import thrift from 'thrift';
+import { Q } from 'thrift';
+import types from './thrift/beeswax_types';
+import service from './thrift/ImpalaService';
 
 /**
- * Constructor method of ImpalaClient which initializes
- * essential properties for connection.
+ * The class contains essential functions for executing
+ * queries via Beeswax service.
  *
  * @param props
- * @constructor
+ * @class
  */
-function ImpalaClient(props) {
-    this.props = typeof props !== 'undefined' ? Object.create(props) : {};
-    this.host = typeof this.props.host !== 'undefined' ? this.props.host : '127.0.0.1';
-    this.port = typeof this.props.port !== 'undefined' ? this.props.port : 21000;
-    this.transport = typeof this.props.transport !== 'undefined' ? this.props.transport : thrift.TBufferedTransport;
-    this.protocol = typeof this.props.protocol !== 'undefined' ? this.props.protocol : thrift.TBinaryProtocol;
+class ImpalaClient {
+  constructor(props = {}) {
+    this.host = props.host || '127.0.0.1';
+    this.port = props.port || 21000;
+    this.resultType = props.resultType || null;
+    this.timeout = props.timeout || 1000;
+    this.transport = props.transport || thrift.TBufferedTransport;
+    this.protocol = props.protocol || thrift.TBinaryProtocol;
     this.options = {
-        transport: this.transport,
-        protocol: this.protocol
+      transport: this.transport,
+      protocol: this.protocol,
     };
-    this.mapping = typeof this.props.mapping !== 'undefined' ? this.props.mapping : true;
-    this.timeout = typeof this.props.timeout !== 'undefined' ? this.props.timeout : 1000;
-}
+  }
 
-/**
- * Transmits SQL commands and receive results by Beeswax.
- *
- * @param sql
- * @param callback
- * @returns {*|promise}
- */
-ImpalaClient.prototype.query = function (sql, callback) {
-    var deferred = Q.defer(),
-        connection = thrift.createConnection(this.host, this.port, this.options),
-        client = thrift.createClient(service, connection),
-        query = new types.Query({ query: sql }),
-        mapping = this.mapping,
-        timeout = this.timeout;
+  /**
+   * Transmits SQL commands and receives results by Beeswax.
+   *
+   * @param sql
+   * @param callback
+   * @returns {*|promise}
+   */
+  query(sql, callback) {
+    const deferred = Q.defer();
+    const connection = thrift.createConnection(this.host, this.port, this.options);
+    const client = thrift.createClient(service, connection);
+    const query = ImpalaClient.createQuery(sql);
+    const resultType = this.resultType;
+    const timeout = this.timeout;
 
     client.query(query)
-        .then(function (handle) {
-            return [handle, client.get_state(handle)];
-        })
-        .spread(function (handle, state) {
-            return [handle, state, client.fetch(handle)];
-        })
-        .spread(function (handle, state, result) {
-            return [state, result, client.get_results_metadata(handle)];
-        })
-        .spread(function (state, result, metaData) {
-            var schemas = metaData.schema.fieldSchemas,
-                data = result.data,
-                map = new Map();
-            if (mapping) {
-                for (var j = 0; j < schemas.length; j++) {
-                    var resultArray = [];
-                    for (var i = 0; i < data.length; i++) {
-                        resultArray.push(data[i].split("\t")[j]);
-                    }
-                    map.set(schemas[j].name, resultArray);
-                }
-                deferred.resolve(map);
-            } else {
-                deferred.resolve([data, schemas]);
-            }
-            return state;
-        })
-        .then(function (state) {
-            if (state === types.QueryState.FINISHED) {
-                connection.end();
-            }
-        })
-        .catch(function (err) {
-            deferred.reject(err);
-        })
-        .finally(function () {
-            if (connection.connected) {
-                setTimeout(function () {
-                    connection.end();
-                }, timeout)
-            }
-        });
+      .then(handle =>
+        [handle, client.get_state(handle)]
+      )
+      .spread((handle, state) =>
+        [handle, state, client.fetch(handle)]
+      )
+      .spread((handle, state, result) =>
+        [state, result, client.get_results_metadata(handle)]
+      )
+      .spread((state, result, metaData) => {
+        const schemas = metaData.schema.fieldSchemas;
+        const data = result.data;
+        const processedData = ImpalaClient.processData(data, schemas, resultType);
+
+        deferred.resolve(processedData);
+
+        return state;
+      })
+      .then((state) => {
+        if (state === types.QueryState.FINISHED) {
+          connection.end();
+        }
+      })
+      .catch(err => deferred.reject(err))
+      .finally(() => {
+        if (connection.connected) {
+          setTimeout(() => {
+            connection.end();
+          }, timeout);
+        }
+      });
 
     deferred.promise.nodeify(callback);
     return deferred.promise;
+  }
+}
+
+/**
+ * Creates Beeswax query object.
+ *
+ * @param sql SQL statement as string or Beeswax query object
+ * @returns {*}
+ */
+ImpalaClient.createQuery = (sql) => {
+  if (sql instanceof types.Query) {
+    return sql;
+  }
+
+  return new types.Query({ query: sql });
 };
 
-module.exports.createClient = function (props) {
-    return new ImpalaClient(props);
+/**
+ * Processes then returns the data according to desired type.
+ *
+ * @param data
+ * @param schemas
+ * @param type
+ * @returns {object}
+ */
+ImpalaClient.processData = (data, schemas, type) => {
+  switch (type) {
+    case 'map': {
+      let resultArray = [];
+      const map = new Map();
+
+      for (let i = 0; i < schemas.length; i++) {
+        resultArray = [];
+        for (let j = 0; j < data.length; j++) {
+          resultArray.push(data[j].split('\t')[i]);
+        }
+        map.set(schemas[i].name, resultArray);
+      }
+
+      return map;
+    }
+    case 'array': {
+      let resultObject = {};
+      const array = [];
+      const schemaNames = [];
+
+      for (let i = 0; i < schemas.length; i++) {
+        schemaNames.push(schemas[i].name);
+      }
+
+      for (let i = 0; i < data.length; i++) {
+        resultObject = {};
+        for (let j = 0; j < schemaNames.length; j++) {
+          resultObject[schemaNames[j]] = data[i].split('\t')[j];
+        }
+        array.push(resultObject);
+      }
+
+      return array;
+    }
+    case 'boolean': {
+      return (data !== undefined) && (schemas !== undefined);
+    }
+    default: {
+      return [data, schemas];
+    }
+  }
 };
+
+module.exports.createClient = (props) => new ImpalaClient(props);
