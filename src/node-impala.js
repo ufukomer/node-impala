@@ -1,14 +1,13 @@
 /**
  * @module NodeImpala
  */
-import thrift from 'thrift';
-import { Q } from 'thrift';
+import thrift, { Q } from 'thrift';
 import types from './thrift/beeswax_types';
 import service from './thrift/ImpalaService';
 
 /**
  * The class contains essential functions for executing
- * queries via Beeswax service.
+ * queries via Beeswax Service.
  *
  * @param props
  * @class
@@ -62,7 +61,7 @@ class ImpalaClient {
         return state;
       })
       .then((state) => {
-        if (state === types.QueryState.FINISHED) {
+        if (state > 2) {
           connection.end();
         }
       })
@@ -118,7 +117,7 @@ ImpalaClient.processData = (data, schemas, type) => {
 
       return map;
     }
-    case 'array': {
+    case 'json-array': {
       let resultObject = {};
       const array = [];
       const schemaNames = [];
