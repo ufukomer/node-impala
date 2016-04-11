@@ -1,17 +1,15 @@
-"use strict";
+import impala from '../';
 
-var impala = require('../');
-
-var client = impala.createClient({
-    host: '192.168.93.128'
+const client = impala.createClient({
+  resultType: 'json-array'
 });
 
-var sql = "SELECT * FROM sample_07 limit 5";
+const sql = 'SELECT * FROM sample_07 LIMIT 5';
 
 client.query(sql)
-    .then(function (result) {
-        console.log(result);
-    })
-    .catch(function (err) {
-        console.error(err);
-    });
+  .then((result) => {
+    console.log(result);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
