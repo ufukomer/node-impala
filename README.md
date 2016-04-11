@@ -59,12 +59,12 @@ const client = impala.createClient({
 const sql = 'SELECT * FROM sample_07 LIMIT 5';
 
 client.query(sql)
-    .then((result) => {
-        console.log(result);
-    })
-    .catch((err) => {
-        console.error(err);
-    });
+  .then((result) => {
+    console.log(result);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 ```
 
 ## Options
@@ -92,7 +92,7 @@ is used to transmit commands and receive results by Beeswax.
 ### resultType
 
 Type: `string`<br>
-Default: `boolean`
+Default: `'boolean'`
 
 Returns result of query according to the given type.
 
