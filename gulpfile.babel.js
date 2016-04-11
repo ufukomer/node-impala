@@ -4,18 +4,18 @@ import babel from 'gulp-babel';
 
 const basePaths = {
   src: 'src/',
-  dest: 'lib/',
+  dest: 'lib/'
 };
 
 const paths = {
   js: {
     src: `${basePaths.src}*.js`,
-    dest: basePaths.dest,
+    dest: basePaths.dest
   },
   thrift: {
     src: `${basePaths.src}thrift/*.thrift`,
-    dest: `${basePaths.dest}thrift/`,
-  },
+    dest: `${basePaths.dest}thrift/`
+  }
 };
 
 /**
@@ -34,7 +34,7 @@ gulp.task('watch', ['compile:js'], () => {
 gulp.task('thrift', () => {
   gulp.src(paths.thrift.src)
     .pipe(thrift({
-      gen: 'js:node',
+      gen: 'js:node'
     }))
     .pipe(gulp.dest(paths.thrift.dest));
 });
@@ -45,7 +45,7 @@ gulp.task('thrift', () => {
 gulp.task('compile:js', () => {
   gulp.src(paths.js.src)
     .pipe(babel({
-      presets: ['es2015'],
+      presets: ['es2015']
     }))
     .on('error', console.error.bind(console))
     .pipe(gulp.dest(paths.js.dest));
