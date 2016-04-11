@@ -6,13 +6,16 @@ import types from './thrift/beeswax_types';
 import service from './thrift/ImpalaService';
 
 /**
- * The class contains essential functions for executing
- * queries via Beeswax Service.
- *
- * @param props
- * @class
+ * The class contains essential functions for executing queries
+ * via Beeswax Service.
  */
 class ImpalaClient {
+
+  /**
+   * Constructor assigns essential instance values to start connection.
+   *
+   * @param props {object}
+   */
   constructor(props = {}) {
     this.host = props.host || '127.0.0.1';
     this.port = props.port || 21000;
@@ -22,16 +25,16 @@ class ImpalaClient {
     this.protocol = props.protocol || thrift.TBinaryProtocol;
     this.options = {
       transport: this.transport,
-      protocol: this.protocol,
+      protocol: this.protocol
     };
   }
 
   /**
-   * Transmits SQL commands and receives results by Beeswax.
+   * Transmits SQL command and receives result via Beeswax Service.
    *
-   * @param sql
-   * @param callback
-   * @returns {*|promise}
+   * @param sql {string}
+   * @param callback {function}
+   * @returns {function|promise}
    */
   query(sql, callback) {
     const deferred = Q.defer();
@@ -80,10 +83,10 @@ class ImpalaClient {
 }
 
 /**
- * Creates Beeswax query object.
+ * Creates Beeswax type query object.
  *
- * @param sql SQL statement as string or Beeswax query object
- * @returns {*}
+ * @param sql {string} SQL statement as string or Beeswax query object.
+ * @returns {object}
  */
 ImpalaClient.createQuery = (sql) => {
   if (sql instanceof types.Query) {
@@ -96,10 +99,10 @@ ImpalaClient.createQuery = (sql) => {
 /**
  * Processes then returns the data according to desired type.
  *
- * @param data
- * @param schemas
- * @param type
- * @returns {object}
+ * @param data {object}
+ * @param schemas {object}
+ * @param type {string}
+ * @returns {object} processed as the given data.
  */
 ImpalaClient.processData = (data, schemas, type) => {
   switch (type) {
