@@ -11,16 +11,16 @@ $ npm install --save node-impala
 ## Usage
 
 ```js
-var impala = require('node-impala');
+import impala from 'node-impala';
 
-var client = impala.createClient();
+const client = impala.createClient();
 
-client.query("SELECT column_name FROM table_name", function (err, result) {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log(result);
-    }
+client.query('SELECT column_name FROM table_name', (err, result) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(result);
+  }
 });
 ```
 
@@ -29,41 +29,40 @@ client.query("SELECT column_name FROM table_name", function (err, result) {
 ### Using callback
 
 ```js
-var impala = require('node-impala');
+import impala from 'node-impala';
 
-var client = impala.createClient({
-    host: '192.168.93.128',
-    mapping: false
+const client = impala.createClient({
+  host: '192.168.93.128',
+  resultType: 'json-array'
 });
 
-var sql = "SELECT * FROM sample_07 LIMIT 5";
+const sql = 'SELECT * FROM sample_07 LIMIT 5';
 
-client.query(sql, function (err, result) {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log(result);
-    }
+client.query(sql, (err, result) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(result);
+  }
 });
 ```
 
 ### Using promise
 
 ```js
-var impala = require('node-impala');
+import impala from 'node-impala';
 
-var client = impala.createClient({
-    host: '192.168.93.128',
-    timeout: 5000
+const client = impala.createClient({
+  resultType: 'json-array'
 });
 
-var sql = "SELECT * FROM sample_07 LIMIT 5";
+const sql = 'SELECT * FROM sample_07 LIMIT 5';
 
 client.query(sql)
-    .then(function (result) {
+    .then((result) => {
         console.log(result);
     })
-    .catch(function (err) {
+    .catch((err) => {
         console.error(err);
     });
 ```
@@ -90,12 +89,18 @@ Default: `21000`
 Default value corresponds to Impala Daemon Frontend Port which
 is used to transmit commands and receive results by Beeswax.
 
-### mapping
+### resultType
 
-Type: `boolean`<br>
-Default: `true`
+Type: `string`<br>
+Default: `boolean`
 
-Maps query results with schema names.
+Returns result of query according to the given type.
+
+Available variables:
+
+- `json-array` returns json array
+- `map` maps columns to rows
+- `boolean` returns false if data is undefined
 
 ### timeout
 
@@ -107,11 +112,6 @@ Timeout value for closing connection if it remains open.
 ## Versions
 
 `1.x.x` uses Impala `chd5-2.1_5.3.0`.
-
-## Contributing
-
-Pull requests must follow coding standard. Please scrutinize
-commits carefully.
 
 ## License
 
