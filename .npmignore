@@ -2,5 +2,9 @@
 examples
 src
 test
-gulpfile.js
+gulpfile.babel.js
 .travis.yml
+.eslintrc
+.eslintignore
+.editorconfig
+.babelrc
