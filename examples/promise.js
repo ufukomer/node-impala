@@ -1,4 +1,4 @@
-import impala from '../';
+import * as impala from '../';
 
 const client = impala.createClient({
   resultType: 'json-array'

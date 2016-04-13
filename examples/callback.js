@@ -1,6 +1,6 @@
-import impala from '../';
+import { createClient } from '../';
 
-const client = impala.createClient({
+const client = createClient({
   resultType: 'json-array'
 });
 
