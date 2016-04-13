@@ -11,7 +11,7 @@ $ npm install --save node-impala
 ## Usage
 
 ```js
-import impala from 'node-impala';
+import * as impala from 'node-impala';
 
 const client = impala.createClient();
 
@@ -29,9 +29,9 @@ client.query('SELECT column_name FROM table_name', (err, result) => {
 ### Using callback
 
 ```js
-import impala from 'node-impala';
+import { createClient } from 'node-impala';
 
-const client = impala.createClient({
+const client = createClient({
   host: '192.168.93.128',
   resultType: 'json-array'
 });
@@ -50,9 +50,9 @@ client.query(sql, (err, result) => {
 ### Using promise
 
 ```js
-import impala from 'node-impala';
+import { createClient } from 'node-impala';
 
-const client = impala.createClient({
+const client = createClient({
   resultType: 'json-array'
 });
 
