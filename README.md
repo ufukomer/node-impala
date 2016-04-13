@@ -100,7 +100,7 @@ Available variables:
 
 - `json-array` returns json array
 - `map` maps columns to rows
-- `boolean` returns false if data is undefined
+- `boolean` returns true if query is successful
 
 ### timeout
 
