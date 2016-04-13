@@ -1,7 +1,7 @@
 /**
  * @module NodeImpala
  */
-import thrift, { Q } from 'thrift';
+import thrift from 'thrift';
 import types from './thrift/beeswax_types';
 import service from './thrift/ImpalaService';
 
@@ -37,12 +37,14 @@ class ImpalaClient {
    * @returns {function|promise}
    */
   query(sql, callback) {
-    const deferred = Q.defer();
+    const deferred = thrift.Q.defer();
     const connection = thrift.createConnection(this.host, this.port, this.options);
     const client = thrift.createClient(service, connection);
     const query = ImpalaClient.createQuery(sql);
     const resultType = this.resultType;
     const timeout = this.timeout;
+
+    connection.on('error', err => deferred.reject(err));
 
     client.query(query)
       .then(handle =>
@@ -148,4 +150,4 @@ ImpalaClient.processData = (data, schemas, type) => {
   }
 };
 
-module.exports.createClient = (props) => new ImpalaClient(props);
+export const createClient = props => new ImpalaClient(props);
