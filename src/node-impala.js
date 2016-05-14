@@ -32,24 +32,19 @@ class ImpalaClient {
     };
 
     const deferred = Q.defer();
-    const _ = ImpalaClient;
 
-    try {
-      const connection = thrift.createConnection(this.host, this.port, this.options);
-      const client = thrift.createClient(service, connection);
+    const connection = thrift.createConnection(this.host, this.port, this.options);
+    const client = thrift.createClient(service, connection);
 
-      if (this.connection) {
-        if (!_.isObjEmpty(this.connection.client._reqs)) {
-          throw new Error('A query with current connection is being processed.');
-        }
-      } else {
-        this.client = client;
-        this.connection = connection;
-      }
-      deferred.resolve(connection);
-    } catch (err) {
-      deferred.reject(err);
-    }
+    connection.on('error', (err) =>
+      deferred.reject(err)
+    );
+    connection.on('connect', () =>
+      deferred.resolve('Connection is established.')
+    );
+
+    this.client = client;
+    this.connection = connection;
 
     deferred.promise.nodeify(callback);
     return deferred.promise;
@@ -125,11 +120,11 @@ class ImpalaClient {
 
           return handle;
         })
-        .catch(err => deferred.reject(err))
-        .done((handle) => {
+        .then((handle) => {
           client.clean(handle.id);
           client.close(handle);
-        });
+        })
+        .catch(err => deferred.reject(err));
     }
 
     deferred.promise.nodeify(callback);
@@ -173,11 +168,11 @@ class ImpalaClient {
 
           return handle;
         })
-        .catch(err => deferred.reject(err))
-        .done((handle) => {
+        .then((handle) => {
           client.clean(handle.id);
           client.close(handle);
-        });
+        })
+        .catch(err => deferred.reject(err));
     }
 
     deferred.promise.nodeify(callback);
@@ -209,8 +204,7 @@ ImpalaClient.createQuery = (sql) => {
  */
 ImpalaClient.processData = (data, schemas, type) => {
   switch (type) {
-    case 'map':
-    {
+    case 'map': {
       let resultArray = [];
       const map = new Map();
 
@@ -224,8 +218,7 @@ ImpalaClient.processData = (data, schemas, type) => {
 
       return map;
     }
-    case 'json-array':
-    {
+    case 'json-array': {
       let resultObject = {};
       const array = [];
       const schemaNames = [];
@@ -244,12 +237,10 @@ ImpalaClient.processData = (data, schemas, type) => {
 
       return array;
     }
-    case 'boolean':
-    {
+    case 'boolean': {
       return (data !== undefined) && (schemas !== undefined);
     }
-    default:
-    {
+    default: {
       return [data, schemas];
     }
   }
