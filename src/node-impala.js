@@ -36,12 +36,13 @@ class ImpalaClient {
     const connection = thrift.createConnection(this.host, this.port, this.options);
     const client = thrift.createClient(service, connection);
 
-    connection.on('error', (err) =>
-      deferred.reject(err)
-    );
-    connection.on('connect', () =>
-      deferred.resolve('Connection is established.')
-    );
+    connection.on('error', (err) => {
+      deferred.reject(err);
+    });
+
+    connection.on('connect', () => {
+      deferred.resolve('Connection is established.');
+    });
 
     this.client = client;
     this.connection = connection;
@@ -144,11 +145,16 @@ class ImpalaClient {
     const query = ImpalaClient.createQuery(sql);
     const resultType = this.resultType;
     const client = this.client;
+    const connection = this.connection;
     const _ = ImpalaClient;
 
-    if (!client) {
+    if (!client || !connection) {
       deferred.reject(new Error('Connection was not created.'));
     } else {
+      connection.on('error', (err) =>
+        deferred.reject(err)
+      );
+
       client.query(query)
         .then(handle =>
           [handle, client.get_state(handle)]
