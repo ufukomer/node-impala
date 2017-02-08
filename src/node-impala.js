@@ -5,6 +5,10 @@ import thrift, { Q } from 'thrift';
 import types from './thrift/beeswax_types';
 import service from './thrift/ImpalaService';
 
+const _onErrorDeferred = deferred => err => {
+  deferred.reject(err);
+};
+
 /**
  * The class contains essential functions for executing queries
  * via Beeswax Service.
@@ -36,9 +40,7 @@ class ImpalaClient {
     const connection = thrift.createConnection(this.host, this.port, this.options);
     const client = thrift.createClient(service, connection);
 
-    connection.on('error', (err) => {
-      deferred.reject(err);
-    });
+    connection.on('error', _onErrorDeferred(deferred));
 
     connection.on('connect', () => {
       deferred.resolve('Connection is established.');
@@ -151,9 +153,12 @@ class ImpalaClient {
     if (!client || !connection) {
       deferred.reject(new Error('Connection was not created.'));
     } else {
-      connection.on('error', (err) =>
-        deferred.reject(err)
-      );
+      // increase the maximum number of listeners by 1
+      // while this promise is in progress
+      connection.setMaxListeners(connection.getMaxListeners() + 1);
+
+      const onErrorCallback = _onErrorDeferred(deferred);
+      connection.on('error', onErrorCallback);
 
       client.query(query)
         .then(handle =>
@@ -176,6 +181,11 @@ class ImpalaClient {
         })
         .then((handle) => {
           client.clean(handle.id);
+
+          // this promise is done, so we lower the maximum number of listeners
+          connection.setMaxListeners(connection.getMaxListeners() - 1);
+          connection.removeListener('error', onErrorCallback);
+
           client.close(handle);
         })
         .catch(err => deferred.reject(err));
