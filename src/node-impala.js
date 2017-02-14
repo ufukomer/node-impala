@@ -2,12 +2,10 @@
  * @module NodeImpala
  */
 import thrift, { Q } from 'thrift';
+/* eslint-disable import/extensions, import/no-unresolved */
 import types from './thrift/beeswax_types';
 import service from './thrift/ImpalaService';
-
-const _onErrorDeferred = deferred => err => {
-  deferred.reject(err);
-};
+/* eslint-enable */
 
 /**
  * The class contains essential functions for executing queries
@@ -40,7 +38,7 @@ class ImpalaClient {
     const connection = thrift.createConnection(this.host, this.port, this.options);
     const client = thrift.createClient(service, connection);
 
-    connection.on('error', _onErrorDeferred(deferred));
+    connection.on('error', ImpalaClient.onErrorDeferred(deferred));
 
     connection.on('connect', () => {
       deferred.resolve('Connection is established.');
@@ -67,6 +65,7 @@ class ImpalaClient {
       deferred.reject(new Error('Connection was not created.'));
     } else {
       conn.end();
+      deferred.resolve('Connection has ended.');
     }
 
     deferred.promise.nodeify(callback);
@@ -115,7 +114,7 @@ class ImpalaClient {
       deferred.reject(new Error('Connection was not created.'));
     } else {
       client.query(query)
-        .then((handle) =>
+        .then(handle =>
           [handle, client.get_results_metadata(handle)]
         )
         .spread((handle, metaData) => {
@@ -148,7 +147,6 @@ class ImpalaClient {
     const resultType = this.resultType;
     const client = this.client;
     const connection = this.connection;
-    const _ = ImpalaClient;
 
     if (!client || !connection) {
       deferred.reject(new Error('Connection was not created.'));
@@ -157,7 +155,7 @@ class ImpalaClient {
       // while this promise is in progress
       connection.setMaxListeners(connection.getMaxListeners() + 1);
 
-      const onErrorCallback = _onErrorDeferred(deferred);
+      const onErrorCallback = ImpalaClient.onErrorDeferred(deferred);
       connection.on('error', onErrorCallback);
 
       client.query(query)
@@ -173,7 +171,7 @@ class ImpalaClient {
         .spread((handle, state, result, metaData) => {
           const schemas = metaData.schema.fieldSchemas;
           const data = result.data;
-          const processedData = _.processData(data, schemas, resultType);
+          const processedData = ImpalaClient.processData(data, schemas, resultType);
 
           deferred.resolve(processedData);
 
@@ -224,9 +222,9 @@ ImpalaClient.processData = (data, schemas, type) => {
       let resultArray = [];
       const map = new Map();
 
-      for (let i = 0; i < schemas.length; i++) {
+      for (let i = 0; i < schemas.length; i += 1) {
         resultArray = [];
-        for (let j = 0; j < data.length; j++) {
+        for (let j = 0; j < data.length; j += 1) {
           resultArray.push(data[j].split('\t')[i]);
         }
         map.set(schemas[i].name, resultArray);
@@ -239,13 +237,13 @@ ImpalaClient.processData = (data, schemas, type) => {
       const array = [];
       const schemaNames = [];
 
-      for (let i = 0; i < schemas.length; i++) {
+      for (let i = 0; i < schemas.length; i += 1) {
         schemaNames.push(schemas[i].name);
       }
 
-      for (let i = 0; i < data.length; i++) {
+      for (let i = 0; i < data.length; i += 1) {
         resultObject = {};
-        for (let j = 0; j < schemaNames.length; j++) {
+        for (let j = 0; j < schemaNames.length; j += 1) {
           resultObject[schemaNames[j]] = data[i].split('\t')[j];
         }
         array.push(resultObject);
@@ -262,18 +260,9 @@ ImpalaClient.processData = (data, schemas, type) => {
   }
 };
 
-ImpalaClient.getObjSize = (obj) => {
-  let count = 0;
-
-  for (const i in obj) {
-    if (obj.hasOwnProperty(i)) {
-      count++;
-    }
-  }
-
-  return count;
+ImpalaClient.onErrorDeferred = deferred => (err) => {
+  deferred.reject(err);
 };
 
-ImpalaClient.isObjEmpty = obj => !ImpalaClient.getObjSize(obj) > 0;
-
+// eslint-disable-next-line import/prefer-default-export
 export const createClient = props => new ImpalaClient(props);

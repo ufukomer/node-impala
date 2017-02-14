@@ -82,7 +82,7 @@ Creates client that uses BeeswaxService.
 const client = createClient();
 ```
 
-### client.connect(props, [callback])
+### client.connect(props, callback)
 
 Creates connection using given props.
 
@@ -92,7 +92,7 @@ client.connect({ resultType: 'boolean' })
   .catch(error => console.error(error));
 ```
 
-### client.close([callback])
+### client.close(callback)
 
 Closes the current connection.
 

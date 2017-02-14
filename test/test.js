@@ -1,45 +1,48 @@
-"use strict";
+import test from 'ava';
+import { createClient } from '../';
 
-var thrift = require('thrift');
-var assert = require('assert');
-var service = require('../lib/thrift/ImpalaService');
-var types = require('../lib/thrift/beeswax_types');
-var config = require('./config');
+const client = createClient();
 
-var connection = thrift.createConnection(config.server, config.port, {
-    transport: thrift.TBufferedTransport,
-    protocol: thrift.TBinaryProtocol
-});
+if (process.env.CI) {
+  test('travis', (t) => {
+    t.pass();
+  });
+} else {
+  const sql = 'SELECT * FROM crimes LIMIT 5';
 
-connection.on('error', function (err) {
-    assert.ifError(err);
-});
-
-var query = new types.Query({
-    query: "SELECT * FROM " + config.table + " LIMIT 5"
-});
-
-var client = thrift.createClient(service, connection);
-
-client.query(query, function (err, handle) {
-    assert.ifError(err);
-    client.get_state(handle, function (err, state) {
-        assert.ifError(err);
-        client.explain(query, function (err, explain) {
-            assert.ifError(err);
-            client.fetch(handle, false, 100, function (err, result) {
-                assert.ifError(err);
-                client.get_results_metadata(handle, function (err, metaData) {
-                    assert.ifError(err);
-                    assert.ok(explain.textual);
-                    assert.equal(5, result.data.length);
-                    assert.ok(metaData.schema.fieldSchemas[0].name);
-                    assert.ok(metaData.schema.fieldSchemas[0].type);
-                    if (state === types.QueryState.FINISHED) {
-                        connection.end();
-                    }
-                });
-            });
-        });
+  test.before('create a new connection', () => {
+    client.connect({
+      host: '127.0.0.1',
+      port: 21000,
+      resultType: 'json-array'
     });
-});
+  });
+
+  test('client should have props', (t) => {
+    t.is(client.host, '127.0.0.1');
+    t.is(client.port, 21000);
+    t.is(client.resultType, 'json-array');
+    t.is(client.timeout, 1000);
+  });
+
+  test('query should return the result', async (t) => {
+    const result = await client.query(sql);
+    t.is(5, result.length);
+    t.truthy(result);
+  });
+
+  test('explain should return the query plan', async (t) => {
+    const explanation = await client.explain(sql);
+    t.truthy(explanation);
+  });
+
+  test('getResultsMetadata should return the result metadata', async (t) => {
+    const metaData = await client.getResultsMetadata(sql);
+    t.truthy(metaData);
+  });
+
+  test.after('close the connection', async (t) => {
+    const error = await client.close();
+    t.truthy(error);
+  });
+}
