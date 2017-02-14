@@ -1,5 +1,4 @@
 .idea
-examples
 src
 test
 gulpfile.babel.js
