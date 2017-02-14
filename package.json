@@ -1,6 +1,6 @@
 {
   "name": "node-impala",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Node Client for Impala using Apache Thrift.",
   "author": "Ömer Ufuk Efendioğlu <ufukomer@gmail.com> (http://ufukomer.github.io)",
   "contributors": [
