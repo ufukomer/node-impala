@@ -136,4 +136,4 @@ client.query(sql)
 
 ## License
 
-MIT © [ufukomer](http://ufukomer.com)
+MIT © [Ömer Ufuk Efendioğlu](http://ufukomer.github.io)
