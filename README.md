@@ -122,7 +122,7 @@ client.getResultsMetadata(sql)
 
 ### client.query(sql, callback)
 
-Transmits SQL command and receives result via Beeswax Service. The query runs asynchronously.
+Transmits SQL command and receives result via Beeswax Service asynchronously. Fetch size is fixed as 1024, namely, it returns the maximum 1024 results of a query.
 
 ```js
 client.query(sql)
