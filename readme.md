@@ -1,6 +1,6 @@
 # node-impala [![Build Status](https://travis-ci.org/ufukomer/node-impala.svg?branch=master)](https://travis-ci.org/ufukomer/node-impala)
 
-> Node client for Impala.
+> Node client for Impala
 
 ## Install
 
