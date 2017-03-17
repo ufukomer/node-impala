@@ -29,6 +29,10 @@ client.query('SELECT column_name FROM table_name')
   .done(() => client.close().catch(err => console.error(err)));
 ```
 
+## Example
+
+[Bloomery](https://github.com/ufukomer/bloomery): Web UI for Impala and uses this client to execute queries.
+
 ## Options
 
 ### host
