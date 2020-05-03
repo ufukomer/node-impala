@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "test": "eslint . && ava --verbose",
-    "start": "node index.js"
+    "start": "node index.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "main": "index.js",
   "repository": {
@@ -32,7 +34,8 @@
   "license": "MIT",
   "analyze": true,
   "dependencies": {
-    "thrift": "^0.13.0"
+    "thrift": "^0.13.0",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "ava": "^0.18.1",
@@ -48,5 +51,6 @@
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.2",
     "gulp-thrift": "0.0.2"
-  }
+  },
+  "snyk": true
 }
