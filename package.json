@@ -34,7 +34,7 @@
   "license": "MIT",
   "analyze": true,
   "dependencies": {
-    "thrift": "^0.13.0",
+    "thrift": "^0.14.0",
     "snyk": "^1.316.1"
   },
   "devDependencies": {
